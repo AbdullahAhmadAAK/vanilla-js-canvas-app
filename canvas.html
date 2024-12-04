@@ -8,7 +8,7 @@
 </head>
 
 <body>
-  <canvas width="500" height="500" id="canvas" style="border: 2px solid black"></canvas>
+  <canvas width="500" height="500" id="canvas" style="border: 2px solid black; background-color: yellow;"></canvas>
 
   <label for="">Drawing Mode</label>
   <input type="checkbox" onchange="toggleDrawMode()">
@@ -85,7 +85,7 @@
       // This drawing just needs absolute figures, the same as they were when the line was being made! The viewportTransform will automatically adjust shit here and there.
       lines.forEach((line, idx) => {
 
-        console.log(`letsdraw this line #${idx}`, line, `from the start pos (${previousXDrawing}, ${previousYDrawing})`);
+        // console.log(`letsdraw this line #${idx}`, line, `from the start pos (${previousXDrawing}, ${previousYDrawing})`);
 
         // drawPixels(line.x, line.y)
         if (line.isEraseLine) {
@@ -93,7 +93,7 @@
         } else {
           drawLine(line.x, line.y, line.previousX, line.previousY)
         }
-        
+
 
         // TODO: bullshit most likely
         // previousXDrawing = line.x
@@ -121,6 +121,11 @@
 
       previousX = localX;
       previousY = localY;
+    }
+
+    // If we are trying to zoom out to a level lesser than zoom level 1, then we will not do anything
+    const isZoomAllowed = (viewportTransform, deltaY) => {      
+      return viewportTransform.scale + deltaY * -0.01 >= 1
     }
 
     const updateZooming = (e) => {
@@ -165,7 +170,7 @@
 
       ctx.globalCompositeOperation = 'destination-out'
 
-      ctx.strokeStyle = 'white'
+      // ctx.strokeStyle = 'white' // NOT REALLY NEEDED. Destination out means you're just removing the effects of the pen, regardless of whatever colors they were.
       ctx.lineWidth = penWidth
       ctx.lineCap = 'round'
 
@@ -179,8 +184,8 @@
       // Handle the case of drawing here. If drawing mode is on, then that should be handled.
 
       if (isDrawingMode) {
-        
-        
+
+
 
         // FINAL: yes this is the final solution! I have got it! Eureka!!!! yippieee
         const adjustedX = e.offsetX * viewportTransform.scale - viewportTransform.x;
@@ -200,11 +205,14 @@
           drawLine(xToDraw, yToDraw, previousXDrawing, previousYDrawing)
           lines.push({ x: xToDraw, y: yToDraw, previousX: previousXDrawing, previousY: previousYDrawing, isEraseLine: false })
 
-          
+
         }
-        // bogus attempt
-        previousXDrawing = e.offsetX
-        previousYDrawing = e.offsetY
+        // bogus attempt TODO: problem either here!
+        previousXDrawing = adjustedX
+        previousYDrawing = adjustedY
+
+        console.log('on moving of mouse, these were the assigned prev x and y: ', previousXDrawing, previousYDrawing);
+        
 
 
       } else {
@@ -219,9 +227,11 @@
     }
 
     const onMouseWheel = (e) => {
-      updateZooming(e)
 
-      render()
+      if (isZoomAllowed(viewportTransform, e.deltaY)) {
+        updateZooming(e)
+        render()
+      }
 
       // console.log(e)
     }
@@ -234,12 +244,23 @@
       previousX = e.clientX;
       previousY = e.clientY;
 
-      // This is my attempt to make the drawLine logic work
+      // This is my attempt to make the drawLine logic work TODO: or problem is here
       if (isDrawingMode) {
-        previousXDrawing = e.offsetX
-        previousYDrawing = e.offsetY
+
+        const adjustedX = e.offsetX * viewportTransform.scale - viewportTransform.x;
+        const adjustedY = e.offsetY * viewportTransform.scale - viewportTransform.y;
+
+        previousXDrawing = adjustedX
+        previousYDrawing = adjustedY
+
+        // previousXDrawing = e.offsetX
+        // previousYDrawing = e.offsetY
+
+        // TODO: for some reason, over here e.offsetX is a lot. 
+        // maybe we are using the wrong key for comparing x and y coordinates for drawing, and need something else
+        console.log('in adding event listener, these were prev X and Y: ', previousXDrawing, previousYDrawing)
       }
-      
+
 
       canvas.addEventListener("mousemove", onMouseMove);
     })
