@@ -42,12 +42,26 @@
 
     const drawPixels = (x, y) => {
       ctx.beginPath()
-      
+
       ctx.arc(x, y, penWidth, 2 * Math.PI, false)
       ctx.fillStyle = penColor
 
       ctx.fill()
     }
+
+    const erasePixels = (x, y) => {
+      ctx.save()
+
+      ctx.beginPath()
+      ctx.arc(x, y, penWidth, 2 * Math.PI, false)
+
+      ctx.globalCompositeOperation = 'destination-out'
+
+      ctx.fillStyle = 'white'
+      ctx.fill()
+      ctx.restore()
+    }
+
 
     const render = () => {
 
@@ -66,16 +80,16 @@
       lines.forEach(line => {
 
         console.log('letsdraw this line', line);
-        
+
         drawPixels(line.x, line.y)
       });
 
     }
 
-    
+
     render()
     drawPixels(400, 400)
-    lines.push({x: 400, y: 400})
+    lines.push({ x: 400, y: 400 })
 
 
     // We need to keep track of our previous mouse position for later
@@ -113,6 +127,36 @@
     }
 
 
+    const drawLine = (x, y) => {
+      ctx.beginPath()
+      ctx.moveTo(previousX, previousY)
+      ctx.lineTo(x, y)
+
+      ctx.strokeStyle = penColor
+      ctx.lineWidth = penWidth
+      ctx.lineCap = 'round'
+
+      ctx.stroke()
+    }
+
+    const eraseLine = (x, y) => {
+      ctx.save()
+
+      ctx.beginPath()
+      ctx.moveTo(previousX, previousY)
+      ctx.lineTo(x, y)
+
+      ctx.globalCompositeOperation = 'destination-out'
+
+      ctx.strokeStyle = 'white'
+      ctx.lineWidth = penWidth
+      ctx.lineCap = 'round'
+
+      ctx.stroke()
+      ctx.restore()
+    }
+
+
     const onMouseMove = (e) => {
 
       // Handle the case of drawing here. If drawing mode is on, then that should be handled.
@@ -125,8 +169,18 @@
         const xToDraw = adjustedX
         const yToDraw = adjustedY
 
-        drawPixels(xToDraw, yToDraw)
-        lines.push({x: xToDraw, y: yToDraw})
+        if (e.shiftKey) {
+          erasePixels(xToDraw, yToDraw)
+          lines.push({ x: xToDraw, y: yToDraw }) // TODO: of course we somehow need to remember that this is a erased line. and handle it that way
+        } else {
+
+          drawPixels(xToDraw, yToDraw)
+          lines.push({ x: xToDraw, y: yToDraw })
+
+          
+        }
+
+
       } else {
         updatePanning(e)
         render()
