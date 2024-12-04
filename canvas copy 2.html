@@ -8,20 +8,11 @@
 </head>
 
 <body>
-  <canvas width="500" height="500" id="canvas" style="border: 2px solid black"></canvas>
-
-  <label for="">Drawing Mode</label>
-  <input type="checkbox" onchange="toggleDrawMode()">
+  <canvas width="500" height="500" id="canvas"></canvas>
 
   <script>
-
-    function toggleDrawMode() {
-      isDrawingMode = !isDrawingMode
-    }
-
     const canvas = document.getElementById('canvas')
     const ctx = canvas.getContext('2d')
-    let lines = [];
 
     const viewportTransform = {
       x: 0,
@@ -36,10 +27,8 @@
     }
 
 
-    let isDrawingMode = false
     const penWidth = 5
     const penColor = 'red'
-
     const drawPixels = (x, y) => {
       ctx.beginPath()
       
@@ -57,25 +46,14 @@
       ctx.setTransform(viewportTransform.scale, 0, 0, viewportTransform.scale, viewportTransform.x, viewportTransform.y);
       // New Code 👆
 
-      // drawRect(0, 0, 100, 100, 'red');
-      // drawRect(200, 200, 100, 100, 'blue');
-      // drawPixels(400, 400)
-
-      // Ok, so we DO need to redraw the lines. That means we DO need to KEEP TRACK of them!
-      // This drawing just needs absolute figures, the same as they were when the line was being made! The viewportTransform will automatically adjust shit here and there.
-      lines.forEach(line => {
-
-        console.log('letsdraw this line', line);
-        
-        drawPixels(line.x, line.y)
-      });
-
+      drawRect(0, 0, 100, 100, 'red');
+      drawRect(200, 200, 100, 100, 'blue');
+      drawPixels(400, 400)
     }
 
-    
     render()
-    drawPixels(400, 400)
-    lines.push({x: 400, y: 400})
+
+    
 
 
     // We need to keep track of our previous mouse position for later
@@ -114,26 +92,8 @@
 
 
     const onMouseMove = (e) => {
-
-      // Handle the case of drawing here. If drawing mode is on, then that should be handled.
-
-      if (isDrawingMode) {
-        // FINAL: yes this is the final solution! I have got it! Eureka!!!! yippieee
-        const adjustedX = e.offsetX * viewportTransform.scale - viewportTransform.x;
-        const adjustedY = e.offsetY * viewportTransform.scale - viewportTransform.y;
-
-        const xToDraw = adjustedX
-        const yToDraw = adjustedY
-
-        drawPixels(xToDraw, yToDraw)
-        lines.push({x: xToDraw, y: yToDraw})
-      } else {
-        updatePanning(e)
-        render()
-      }
-
-      // updatePanning(e)
-      // render()
+      updatePanning(e)
+      render()
 
       console.log(e)
     }
