@@ -13,7 +13,13 @@
   <label for="">Drawing Mode</label>
   <input type="checkbox" onchange="toggleDrawMode()">
 
+  <button onclick="showLines()">Show stats of lines</button>
+
   <script>
+
+    function showLines() {
+      console.log(lines)
+    }
 
     function toggleDrawMode() {
       isDrawingMode = !isDrawingMode
@@ -77,23 +83,34 @@
 
       // Ok, so we DO need to redraw the lines. That means we DO need to KEEP TRACK of them!
       // This drawing just needs absolute figures, the same as they were when the line was being made! The viewportTransform will automatically adjust shit here and there.
-      lines.forEach(line => {
+      lines.forEach((line, idx) => {
 
-        console.log('letsdraw this line', line);
+        console.log(`letsdraw this line #${idx}`, line, `from the start pos (${previousXDrawing}, ${previousYDrawing})`);
 
-        drawPixels(line.x, line.y)
+        // drawPixels(line.x, line.y)
+        if (line.isEraseLine) {
+          eraseLine(line.x, line.y, line.previousX, line.previousY)
+        } else {
+          drawLine(line.x, line.y, line.previousX, line.previousY)
+        }
+        
+
+        // TODO: bullshit most likely
+        // previousXDrawing = line.x
+        // previousYDrawing = line.y
       });
 
     }
 
 
     render()
-    drawPixels(400, 400)
-    lines.push({ x: 400, y: 400 })
+    // drawPixels(400, 400)
+    // lines.push({ x: 400, y: 400 })
 
 
     // We need to keep track of our previous mouse position for later
     let previousX = 0, previousY = 0;
+    let previousXDrawing = 0, previousYDrawing = 0;
 
     const updatePanning = (e) => {
       const localX = e.clientX;
@@ -127,9 +144,9 @@
     }
 
 
-    const drawLine = (x, y) => {
+    const drawLine = (x, y, previousPosX, previousPosY) => {
       ctx.beginPath()
-      ctx.moveTo(previousX, previousY)
+      ctx.moveTo(previousPosX, previousPosY)
       ctx.lineTo(x, y)
 
       ctx.strokeStyle = penColor
@@ -139,11 +156,11 @@
       ctx.stroke()
     }
 
-    const eraseLine = (x, y) => {
+    const eraseLine = (x, y, previousPosX, previousPosY) => {
       ctx.save()
 
       ctx.beginPath()
-      ctx.moveTo(previousX, previousY)
+      ctx.moveTo(previousPosX, previousPosY)
       ctx.lineTo(x, y)
 
       ctx.globalCompositeOperation = 'destination-out'
@@ -162,6 +179,9 @@
       // Handle the case of drawing here. If drawing mode is on, then that should be handled.
 
       if (isDrawingMode) {
+        
+        
+
         // FINAL: yes this is the final solution! I have got it! Eureka!!!! yippieee
         const adjustedX = e.offsetX * viewportTransform.scale - viewportTransform.x;
         const adjustedY = e.offsetY * viewportTransform.scale - viewportTransform.y;
@@ -170,15 +190,21 @@
         const yToDraw = adjustedY
 
         if (e.shiftKey) {
-          erasePixels(xToDraw, yToDraw)
-          lines.push({ x: xToDraw, y: yToDraw }) // TODO: of course we somehow need to remember that this is a erased line. and handle it that way
+          // erasePixels(xToDraw, yToDraw)
+          eraseLine(xToDraw, yToDraw, previousXDrawing, previousYDrawing)
+          lines.push({ x: xToDraw, y: yToDraw, previousX: previousXDrawing, previousY: previousYDrawing, isEraseLine: true }) // TODO: of course we somehow need to remember that this is a erased line. and handle it that way
         } else {
 
-          drawPixels(xToDraw, yToDraw)
-          lines.push({ x: xToDraw, y: yToDraw })
+          // drawPixels(xToDraw, yToDraw)
+
+          drawLine(xToDraw, yToDraw, previousXDrawing, previousYDrawing)
+          lines.push({ x: xToDraw, y: yToDraw, previousX: previousXDrawing, previousY: previousYDrawing, isEraseLine: false })
 
           
         }
+        // bogus attempt
+        previousXDrawing = e.offsetX
+        previousYDrawing = e.offsetY
 
 
       } else {
@@ -189,7 +215,7 @@
       // updatePanning(e)
       // render()
 
-      console.log(e)
+      // console.log(e)
     }
 
     const onMouseWheel = (e) => {
@@ -197,15 +223,23 @@
 
       render()
 
-      console.log(e)
+      // console.log(e)
     }
 
     canvas.addEventListener("wheel", onMouseWheel);
 
 
     canvas.addEventListener("mousedown", (e) => {
+      // This is needed for ensuring smooth panning
       previousX = e.clientX;
       previousY = e.clientY;
+
+      // This is my attempt to make the drawLine logic work
+      if (isDrawingMode) {
+        previousXDrawing = e.offsetX
+        previousYDrawing = e.offsetY
+      }
+      
 
       canvas.addEventListener("mousemove", onMouseMove);
     })
