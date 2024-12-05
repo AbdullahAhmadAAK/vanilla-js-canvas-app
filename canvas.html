@@ -5,18 +5,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+
+  <style>
+    #drawingCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1; /* Higher z-index to place it on top */
+    }
+
+  </style>
 </head>
 
 <body>
-  <canvas width="500" height="500" id="canvas" style="border: 2px solid black; background-color: yellow;"></canvas>
+
+  <!-- <canvas width="500" height="500" id="backgroundLayerCanvas" style="border: 2px solid black; background-color: greenyellow;"></canvas> -->
+  <canvas width="500" height="500" id="drawingCanvas" style="border: 2px solid black; background-color: greenyellow;"></canvas>
 
   <label for="">Drawing Mode</label>
   <input type="checkbox" checked onchange="toggleDrawMode()">
 
   <button onclick="showLines()">Show stats of lines</button>
 
+  <button onclick="downloadCanvasImageAndDrawings()">Download the Canvas Image</button>
+
   <script>
 
+    function downloadCanvasImageAndDrawings() {
+      
+    }
+    
     function showLines() {
       console.log(lines)
     }
@@ -25,9 +43,13 @@
       isDrawingMode = !isDrawingMode
     }
 
-    const canvas = document.getElementById('canvas')
+    // const backgroundCanvas = document.getElementById('backgroundLayerCanvas')
+    // const backgroundCtx = backgroundCanvas.getContext('2d')
+
+    const canvas = document.getElementById('drawingCanvas')
     const ctx = canvas.getContext('2d')
 
+    // Drawing of image on the canvas
     imageObj = new Image();
 
     imageObj.onload = function() { 
@@ -81,9 +103,17 @@
     const render = () => {
 
       // New code 👇
+
+      // Code for drawing layer canvas
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.setTransform(viewportTransform.scale, 0, 0, viewportTransform.scale, viewportTransform.x, viewportTransform.y);
+      
+      // Code for background layer canvas
+      // ctx.setTransform(1, 0, 0, 1, 0, 0);
+      // ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // ctx.setTransform(viewportTransform.scale, 0, 0, viewportTransform.scale, viewportTransform.x, viewportTransform.y);
+
       // New Code 👆
 
       // drawRect(0, 0, 100, 100, 'red');
@@ -91,7 +121,7 @@
       // drawPixels(400, 400)
 
       ctx.drawImage(imageObj, 0,0); 
-      
+
       // Ok, so we DO need to redraw the lines. That means we DO need to KEEP TRACK of them!
       // This drawing just needs absolute figures, the same as they were when the line was being made! The viewportTransform will automatically adjust shit here and there.
       lines.forEach((line, idx) => {
@@ -159,18 +189,31 @@
       viewportTransform.scale = newScale;
     }
 
-
     const drawLine = (x, y, previousPosX, previousPosY) => {
-      ctx.beginPath()
-      ctx.moveTo(previousPosX, previousPosY)
-      ctx.lineTo(x, y)
+      // Check if the line is within the image bounds
+      if (x >= 0 && x <= imageObj.width && y >= 0 && y <= imageObj.height &&
+          previousPosX >= 0 && previousPosX <= imageObj.width && previousPosY >= 0 && previousPosY <= imageObj.height) {
+        ctx.beginPath();
+        ctx.moveTo(previousPosX, previousPosY);
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = penColor;
+        ctx.lineWidth = penWidth;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
 
-      ctx.strokeStyle = penColor
-      ctx.lineWidth = penWidth
-      ctx.lineCap = 'round'
+      // NOTE: If want unrestricted drawing all over the canvas, use the below code and uncomment the above code
+      //   ctx.beginPath()
+      //   ctx.moveTo(previousPosX, previousPosY)
+      //   ctx.lineTo(x, y)
 
-      ctx.stroke()
+      //   ctx.strokeStyle = penColor
+      //   ctx.lineWidth = penWidth
+      //   ctx.lineCap = 'round'
+
+      //   ctx.stroke()
     }
+
 
     const eraseLine = (x, y, previousPosX, previousPosY) => {
       ctx.save()
