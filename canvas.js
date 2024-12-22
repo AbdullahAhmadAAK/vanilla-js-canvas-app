@@ -20,11 +20,6 @@ const render = () => {
     } else {
       drawLine(line.x, line.y, line.previousX, line.previousY)
     }
-
-
-    // TODO: bullshit most likely
-    // previousXDrawing = line.x
-    // previousYDrawing = line.y
   });
 
 }
@@ -69,9 +64,6 @@ const updateZooming = (e) => {
 }
 
 const drawLine = (x, y, previousPosX, previousPosY) => {
-  // Check if the line is within the image bounds
-  // if (x >= 0 && x <= imageObj.width && y >= 0 && y <= imageObj.height &&
-  //  previousPosX >= 0 && previousPosX <= imageObj.width && previousPosY >= 0 && previousPosY <= imageObj.height) {
   ctx.beginPath();
   ctx.moveTo(previousPosX, previousPosY);
   ctx.lineTo(x, y);
@@ -79,22 +71,16 @@ const drawLine = (x, y, previousPosX, previousPosY) => {
   ctx.lineWidth = penWidth;
   ctx.lineCap = 'round';
   ctx.stroke();
-  // }
 }
 
 const eraseLine = (x, y, previousPosX, previousPosY) => {
   ctx.save()
-
   ctx.beginPath()
   ctx.moveTo(previousPosX, previousPosY)
   ctx.lineTo(x, y)
-
   ctx.globalCompositeOperation = 'destination-out'
-
-  // ctx.strokeStyle = 'white' // NOT REALLY NEEDED. Destination out means you're just removing the effects of the pen, regardless of whatever colors they were.
   ctx.lineWidth = penWidth
   ctx.lineCap = 'round'
-
   ctx.stroke()
   ctx.restore()
 }
@@ -138,6 +124,32 @@ const onMouseWheel = (e) => {
   }
 }
 
+const onMouseDown = (e) => {
+  // This is needed for ensuring smooth panning
+  previousX = e.clientX;
+  previousY = e.clientY;
+
+  // This is my attempt to make the drawLine logic work
+  if (isDrawingMode) {
+    var bounding = canvas.getBoundingClientRect();
+    var x = e.clientX - bounding.left;
+    var y = e.clientY - bounding.top;
+
+    const p = DOMPoint.fromPoint({ x, y }); // Create a DOMPoint for the pixel coordinates
+    const t = ctx.getTransform().inverse(); // Get the inverse of the transformation applied to the canvas context
+    const { x: adjustedX, y: adjustedY } = t.transformPoint(p); // Use it to calculate context coordinates for your pixel point
+
+    previousXDrawing = adjustedX
+    previousYDrawing = adjustedY
+  }
+
+  canvas.addEventListener("mousemove", onMouseMove);
+}
+
+const onMouseUp = (e) => {
+  canvas.removeEventListener("mousemove", onMouseMove);
+}
+
 // SECTION 3: INITIALIZING VARIABLES AND CONSTANTS
 
 let drawModeType = 'freehand'
@@ -146,7 +158,6 @@ const backgroundCtx = backgroundCanvas.getContext('2d')
 const canvas = document.getElementById('drawingCanvas')
 const ctx = canvas.getContext('2d')
 let lines = [];
-let rectangles = [];
 let previousX = 0, previousY = 0; // these are previous mouse event's X and Y coordinate positions for the canvas
 let previousXDrawing = 0, previousYDrawing = 0; // these are previous mouse event's X and Y coordinate positions for the canvas TODO: resolve confusion
 const viewportTransform = {
@@ -170,38 +181,13 @@ imageObj.src = duckImageSrc; // You can have this come from an uploaded image as
 // SECTION 5: RENDERING THE LINES AT THE START OF THE APP
 render()
 
+// SECTION 6: ADDING THE EVENT LISTENERS TO THE DRAWING CANVAS
 
 // Adding mousewheel event listener to drawing canvas
 canvas.addEventListener("wheel", onMouseWheel);
 
 // Adding mousedown event listener to drawing canvas
-canvas.addEventListener("mousedown", (e) => {
-  // This is needed for ensuring smooth panning
-  previousX = e.clientX;
-  previousY = e.clientY;
-
-  // This is my attempt to make the drawLine logic work
-  if (isDrawingMode) {
-    var bounding = canvas.getBoundingClientRect();
-    var x = e.clientX - bounding.left;
-    var y = e.clientY - bounding.top;
-
-    // Create a DOMPoint for the pixel coordinates
-    const p = DOMPoint.fromPoint({ x, y });
-    // Get the inverse of the transformation applied to the canvas context
-    const t = ctx.getTransform().inverse();
-    // Use it to calculate context coordinates for your pixel point
-    const { x: adjustedX, y: adjustedY } = t.transformPoint(p);
-
-    previousXDrawing = adjustedX
-    previousYDrawing = adjustedY
-  }
-
-
-  canvas.addEventListener("mousemove", onMouseMove);
-})
+canvas.addEventListener("mousedown", onMouseDown)
 
 // Adding mouseup event listener to drawing canvas
-canvas.addEventListener("mouseup", (e) => {
-  canvas.removeEventListener("mousemove", onMouseMove);
-})
+canvas.addEventListener("mouseup", onMouseUp)
