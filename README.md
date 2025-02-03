@@ -12,5 +12,5 @@ Feel free to reach out for any issues you may have understanding this. I would l
 
 **Articles of Harrison Milbradt:**
 
-https://harrisonmilbradt.com/articles/canvas-line-drawing-explorations
-https://harrisonmilbradt.com/articles/canvas-panning-and-zooming
+1 - https://harrisonmilbradt.com/articles/canvas-line-drawing-explorations
+2 - https://harrisonmilbradt.com/articles/canvas-panning-and-zooming
