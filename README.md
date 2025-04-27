@@ -22,10 +22,13 @@ Feel free to reach out for any issues you may have understanding this. I would l
 2. https://harrisonmilbradt.com/articles/canvas-panning-and-zooming
 
 How the end result looked like (it was still in progress, but the core functionality had been implemented in the SvelteKit app):
+
 ![image](https://github.com/user-attachments/assets/ffa4380a-e888-4570-b0eb-73ad533be9ea)
 
-**Panzoom in Action**
-![Pan and zoom](https://github.com/user-attachments/assets/00c48471-1480-4e93-9f06-9acc9bee9b6b)
+**Panzoom in Action**  
 
-**Freehand Drawing and Erasing in Action:**
-![edit and erase](https://github.com/user-attachments/assets/420ef1ff-7a8c-421b-9302-fbb59bc2bd22)
+<img src="https://github.com/user-attachments/assets/00c48471-1480-4e93-9f06-9acc9bee9b6b" width="400"/>
+
+**Freehand Drawing and Erasing in Action:**  
+
+<img src="https://github.com/user-attachments/assets/420ef1ff-7a8c-421b-9302-fbb59bc2bd22" width="400"/>
