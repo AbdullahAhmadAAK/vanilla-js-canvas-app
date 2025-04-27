@@ -1,6 +1,21 @@
+**Intro**
+
 All you need to know about this repo, will be written in [**this article**](https://abdullahaak06.medium.com/tutorial-drawable-and-pannable-zoomable-canvas-in-vanilla-js-0f9e6acd35df).
 
 Just open the HTML file with live server, and watch the magic unfold ;)
+
+**Description**
+
+This is a customized canvas tool, built as an exploration into the possibilities available for me with vanilla JS. I enjoyed myself thoroughly.
+
+**Panzoom in Action**
+
+![image](https://github.com/user-attachments/assets/9442ec32-b2ab-488a-ba52-241e583d855c)
+
+**Freehand Drawing and Erasing in Action:**
+
+![image](https://github.com/user-attachments/assets/7395f17d-3bdb-4364-a96f-279bd5b8706a)
+
 
 **Story:**
 
@@ -16,4 +31,6 @@ Feel free to reach out for any issues you may have understanding this. I would l
 2. https://harrisonmilbradt.com/articles/canvas-panning-and-zooming
 
 How the end result looked like (it was still in progress, but the core functionality had been implemented in the SvelteKit app):
+
 ![image](https://github.com/user-attachments/assets/ffa4380a-e888-4570-b0eb-73ad533be9ea)
+
