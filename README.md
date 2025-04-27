@@ -12,8 +12,8 @@ Feel free to reach out for any issues you may have understanding this. I would l
 
 **Articles of Harrison Milbradt:**
 
-1 - https://harrisonmilbradt.com/articles/canvas-line-drawing-explorations
-2 - https://harrisonmilbradt.com/articles/canvas-panning-and-zooming
+1. https://harrisonmilbradt.com/articles/canvas-line-drawing-explorations
+2. https://harrisonmilbradt.com/articles/canvas-panning-and-zooming
 
 How the end result looked like (it was still in progress, but the core functionality had been implemented in the SvelteKit app):
 ![image](https://github.com/user-attachments/assets/ffa4380a-e888-4570-b0eb-73ad533be9ea)
