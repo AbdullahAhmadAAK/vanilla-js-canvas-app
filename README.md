@@ -25,7 +25,7 @@ How the end result looked like (it was still in progress, but the core functiona
 
 ![image](https://github.com/user-attachments/assets/ffa4380a-e888-4570-b0eb-73ad533be9ea)
 
-**Panzoom in Action**  
+**Panzoom in Action:**  
 
 <img src="https://github.com/user-attachments/assets/00c48471-1480-4e93-9f06-9acc9bee9b6b" width="400"/>
 
